@@ -2,11 +2,10 @@ module.exports = function check(str, bracketsConfig) {
 
     openBrackets = getOpenBrackets(bracketsConfig);
     closeBrackets = getCloseBrackets(bracketsConfig);
-    // fillPairs(bracketsConfig);
+
     return recursive(str);
 }
 
-// возвращает словарь bracket : quantity;
 function getOpenBrackets(config) {
     let firstBrackets = [];
     for (let i = 0; i < config.length; i++) {
@@ -15,7 +14,6 @@ function getOpenBrackets(config) {
     return firstBrackets.join('');
 }
 
-// возвращает словарь bracket : quantity;
 function getCloseBrackets(config) {
     let secondBrackets = [];
     for (let i = 0; i < config.length; i++) {
@@ -36,8 +34,7 @@ function recursive(string) {
 
     for (let i = 0; i < string.length; i++) {
         // console.log(`>>> ${i}`)
-        if (closeBrackets.includes(string[i]) && !openBrackets.includes(string[i])) { // если текущий элемент закрывающая скобка
-        // if (closeBrackets.includes(string[i]) && i !== 0) { // если текущий элемент закрывающая скобка
+        if (closeBrackets.includes(string[i]) && i !== 0) { // если текущий элемент закрывающая скобка
 
             const index = closeBrackets.indexOf(string[i]); // получить комплиментарный индекс скобки
             const openSymbol = openBrackets[index]; // получить саму скобку
@@ -50,27 +47,28 @@ function recursive(string) {
                 do {
                     reverseIndex--;
                     if (reverseIndex < 0) {
-                        return false;
+                        break; // продолжу итерироваться по текущей строке
                     }
 
                 } while (openSymbol !== string[reverseIndex]);
 
-                const inner = recursive(string.slice(reverseIndex + 1, i));
-                if (inner === undefined) {
-                    console.log(`@@@@ ${string} @@@@`);
-                }
-                // console.log(`${string.slice(0, reverseIndex)}${inner}${string.slice(i + 1)}`);
-                if (inner === true) {
-                    return recursive(string.slice(0, reverseIndex) + string.slice(i + 1));
-                } else {
-                    return false;
+                if (reverseIndex !== -1) {
+                    const inner = recursive(string.slice(reverseIndex + 1, i));
+
+                    if (inner === undefined) {
+                        console.log(`@@@@ ${string} @@@@`);
+                    }
+                    console.log(`${string.slice(0, reverseIndex)}${inner}${string.slice(i + 1)}`);
+                    if (inner === true) {
+                        return recursive(string.slice(0, reverseIndex) + string.slice(i + 1));
+                    } else {
+                        return false;
+                    }
                 }
 
-                // return innerString(string.slice(reverseIndex - 1, i + 1));
             }
         }
     }
-
     return identicalCharacters(string);
 }
 
@@ -86,19 +84,8 @@ function identicalCharacters(string) {
             return true;
         }
     }
-
-}
-
-function fillPairs(config) {
-    for (const index in config) {
-        for (let i = 0; i < config[index].length; i++) {
-            pairs.set(config[index][0], config[index][1]);
-        }
-    }
-    // console.log(pairs);
+    return false;
 }
 
 let openBrackets = '';
 let closeBrackets = '';
-
-const pairs = new Map();
